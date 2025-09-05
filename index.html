@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Clinic Management System — Zaryab Dental Clinic</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- App stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- jsPDF for PDF reports -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+
+  <!-- App script -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- LOGIN -->
+  <section id="login-screen">
+    <div id="login-left">
+      <div class="brand">🦷 Zaryab<span class="brand-accent"> Dental </span></div>
+      <div class="muted">Sign in to manage patients, doctors, appointments, bills and reports.</div>
+
+      <div class="card login-card">
+        <label>Username</label>
+        <input class="input" id="login-username"  autocomplete="username" />
+        <label>Password</label>
+        <input class="input" id="login-password" type="password"  autocomplete="current-password" />
+        <div class="error" id="login-error"></div>
+        <button class="btn" id="login-btn">Sign in</button>
+      </div>
+    </div>
+
+    <div id="login-right"></div>
+  </section>
+
+  <!-- APP -->
+  <div id="app">
+    <div class="topbar">
+      <div class="brand">🦷 Zaryab<span class="brand-accent"> Dental</span></div>
+
+      <div class="tabs" role="navigation" aria-label="Main tabs">
+        <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+        <button class="tab-btn" data-tab="patients">Patients</button>
+        <button class="tab-btn" data-tab="doctors">Doctors</button>
+        <button class="tab-btn" data-tab="appointments">Appointments</button>
+        <button class="tab-btn" data-tab="bills">Bills</button>
+        <button class="tab-btn" data-tab="reports">Reports</button>
+        <button class="tab-btn" data-tab="users">Users</button>
+      </div>
+
+      <div class="flex">
+        <span class="badge" id="logged-in-as">admin</span>
+        <button class="tab-btn logout" id="logout-btn">Logout</button>
+      </div>
+    </div>
+
+    <main class="content">
+      <!-- DASHBOARD -->
+      <section id="tab-dashboard" class="tab">
+        <div class="grid stats">
+          <div class="stat">
+            <h3>Total Patients</h3>
+            <div class="num" id="stat-patients">0</div>
+          </div>
+          <div class="stat">
+            <h3>Total Doctors</h3>
+            <div class="num" id="stat-doctors">0</div>
+          </div>
+          <div class="stat">
+            <h3>Total Revenue</h3>
+            <div class="num" id="stat-revenue">PKR 0</div>
+          </div>
+          <div class="stat">
+            <h3>Today's Appointments</h3>
+            <div class="num" id="stat-today">0</div>
+          </div>
+        </div>
+
+        <div class="section-card" style="margin-top:16px">
+          <div class="section-head">
+            <h2 style="margin:0">Today's Appointments</h2>
+            <div class="space"></div>
+            <button class="btn secondary" data-nav="appointments">Go to Appointments</button>
+          </div>
+
+          <table class="table" id="table-today">
+            <thead><tr><th>Time</th><th>Patient</th><th>Doctor</th><th>Specialization</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PATIENTS -->
+      <section id="tab-patients" class="tab hidden">
+        <div class="section-card">
+          <div class="section-head">
+            <h2 style="margin:0">Patients</h2>
+            <div class="space"></div>
+            <button class="btn" id="btn-add-patient">Add Patient</button>
+          </div>
+
+          <table class="table" id="table-patients">
+            <thead><tr><th>Token #</th><th>Name</th><th>Age</th><th>Gender</th><th>Contact</th><th>Address</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="section-card hidden" id="form-patient">
+          <div class="section-head"><h3 style="margin:0" id="patient-form-title">Add Patient</h3></div>
+          <input type="hidden" id="p-id" value="">
+          <div class="form-grid">
+            <input class="input" id="p-token" placeholder="Token No" />
+            <input class="input" id="p-name" placeholder="Full Name" />
+            <input class="input" id="p-age" type="number" placeholder="Age" />
+            <select class="input" id="p-gender">
+              <option value="">Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+            <input class="input" id="p-contact" placeholder="Contact" />
+            <input class="input full" id="p-address" placeholder="Address" />
+          </div>
+
+          <div class="flex" style="margin-top:12px">
+            <div class="space"></div>
+            <button class="btn secondary" id="cancel-patient">Cancel</button>
+            <button class="btn" id="save-patient">Save Patient</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOCTORS -->
+      <section id="tab-doctors" class="tab hidden">
+        <div class="section-card">
+          <div class="section-head">
+            <h2 style="margin:0">Doctors</h2>
+            <div class="space"></div>
+            <button class="btn" id="btn-add-doctor">Add Doctor</button>
+          </div>
+
+          <table class="table" id="table-doctors">
+            <thead><tr><th>Name</th><th>Contact</th><th>Specialization</th><th>Availability</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="section-card hidden" id="form-doctor">
+          <div class="section-head"><h3 style="margin:0" id="doctor-form-title">Add Doctor</h3></div>
+          <input type="hidden" id="d-id" value="">
+          <div class="form-grid">
+            <input class="input" id="d-name" placeholder="Full Name" />
+            <input class="input" id="d-contact" placeholder="Contact" />
+            <input class="input" id="d-spec" placeholder="Specialization" />
+            <input class="input" id="d-avail" placeholder="Availability (e.g., Mon–Fri 10:00–16:00)" />
+          </div>
+
+          <div class="flex" style="margin-top:12px">
+            <div class="space"></div>
+            <button class="btn secondary" id="cancel-doctor">Cancel</button>
+            <button class="btn" id="save-doctor">Save Doctor</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- APPOINTMENTS -->
+      <section id="tab-appointments" class="tab hidden">
+        <div class="section-card">
+          <div class="section-head">
+            <h2 style="margin:0">Appointments</h2>
+            <div class="space"></div>
+            <button class="btn" id="btn-add-appointment">Add Appointment</button>
+          </div>
+
+          <table class="table" id="table-appointments">
+            <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+
+          <div class="helper">Note: One row per patient (latest appointment). Click a row to view <b>all</b> that patient's appointments.</div>
+        </div>
+
+        <div class="section-card hidden" id="ap-detail">
+          <div class="section-head"><h3 style="margin:0">Patient Appointments</h3><div class="space"></div><button class="btn secondary" id="close-ap-detail">Close</button></div>
+          <table class="table" id="table-ap-detail"><thead><tr><th>Date</th><th>Time</th><th>Doctor</th><th>Specialization</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+
+        <div class="section-card hidden" id="form-appointment">
+          <div class="section-head"><h3 style="margin:0" id="appointment-form-title">Add Appointment</h3></div>
+          <input type="hidden" id="a-id" value="">
+          <div class="form-grid">
+            <select class="input" id="a-patient"></select>
+            <select class="input" id="a-doctor"></select>
+            <input class="input" id="a-date" type="date" />
+            <input class="input" id="a-time" type="time" />
+          </div>
+
+          <div class="flex" style="margin-top:12px">
+            <div class="space"></div>
+            <button class="btn secondary" id="cancel-appointment">Cancel</button>
+            <button class="btn" id="save-appointment">Save Appointment</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- BILLS -->
+      <section id="tab-bills" class="tab hidden">
+        <div class="section-card">
+          <div class="section-head">
+            <h2 style="margin:0">Bills</h2>
+            <div class="space"></div>
+            <button class="btn" id="btn-add-bill">Add Bill</button>
+          </div>
+
+          <table class="table" id="table-bills">
+            <thead><tr><th>Patient</th><th>Total Bill</th><th>Received</th><th>Remaining</th><th>Method</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+
+          <div class="helper">Note: One row per patient (latest bill). Click a row to view <b>all</b> bills for that patient.</div>
+        </div>
+
+        <div class="section-card hidden" id="bill-detail">
+          <div class="section-head"><h3 style="margin:0">Patient Bills</h3><div class="space"></div><button class="btn secondary" id="close-bill-detail">Close</button></div>
+          <table class="table" id="table-bill-detail"><thead><tr><th>Date</th><th>Total</th><th>Received</th><th>Remaining</th><th>Method</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+
+        <div class="section-card hidden" id="form-bill">
+          <div class="section-head"><h3 style="margin:0" id="bill-form-title">Add Bill</h3></div>
+          <input type="hidden" id="b-id" value="">
+          <div class="form-grid">
+            <select class="input" id="b-patient"></select>
+            <input class="input" id="b-total" type="number" placeholder="Total Bill" />
+            <input class="input" id="b-received" type="number" placeholder="Received Amount" />
+            <select class="input" id="b-method">
+              <option>Cash</option>
+              <option>Card</option>
+              <option>Bank Transfer</option>
+              <option>Other</option>
+            </select>
+            <input class="input" id="b-date" type="date" />
+          </div>
+
+          <div class="flex" style="margin-top:12px">
+            <div class="space"></div>
+            <button class="btn secondary" id="cancel-bill">Cancel</button>
+            <button class="btn" id="save-bill">Save Bill</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="tab-reports" class="tab hidden">
+        <div class="section-card">
+          <div class="section-head">
+            <h2 style="margin:0">Reports</h2>
+            <div class="space"></div>
+            <button class="btn" id="btn-gen-report">Generate Report</button>
+          </div>
+
+          <table class="table" id="table-reports">
+            <thead><tr><th>Report ID</th><th>Patient</th><th>Date</th><th>Download</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="section-card hidden" id="form-report">
+          <div class="section-head"><h3 style="margin:0">Generate Patient Report</h3></div>
+          <div class="form-grid">
+            <select class="input" id="r-patient"></select>
+          </div>
+
+          <div class="flex" style="margin-top:12px">
+            <div class="space"></div>
+            <button class="btn secondary" id="cancel-report">Cancel</button>
+            <button class="btn" id="make-report">Make Report (PDF)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- USERS -->
+      <section id="tab-users" class="tab hidden">
+        <div class="section-card">
+          <div class="section-head">
+            <h2 style="margin:0">Users</h2>
+            <div class="space"></div>
+            <button class="btn" id="btn-add-user">Add User</button>
+          </div>
+
+          <table class="table" id="table-users">
+            <thead><tr><th>Username</th><th>Role</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="section-card hidden" id="form-user">
+          <div class="section-head"><h3 style="margin:0" id="user-form-title">Add User</h3></div>
+          <input type="hidden" id="u-id" value="">
+          <div class="form-grid">
+            <input class="input" id="u-username" placeholder="Username" />
+            <input class="input" id="u-password" type="password" placeholder="Password" />
+            <select class="input" id="u-role">
+              <option>Admin</option>
+              <option>Receptionist</option>
+              <option>Doctor</option>
+            </select>
+          </div>
+
+          <div class="flex" style="margin-top:12px">
+            <div class="space"></div>
+            <button class="btn secondary" id="cancel-user">Cancel</button>
+            <button class="btn" id="save-user">Save User</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
